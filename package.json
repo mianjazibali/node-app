@@ -1,0 +1,59 @@
+{
+  "name": "express-api-unit-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "mocha": "cross-env NODE_ENV=test mocha tests/**/*.js --recursive --exit",
+    "test": "cross-env NODE_ENV=test sh -c 'npm run db:migrate && npm run mocha'",
+    "test:clean": "cross-env NODE_ENV=test sh -c 'npm run db:clear && npm run mocha'",
+    "db:drop": "npx sequelize-cli db:drop",
+    "db:create": "npx sequelize-cli db:create",
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "db:seed:all": "npx sequelize-cli db:seed:all",
+    "db:clear": "npm run db:drop && npm run db:create && npm run db:migrate",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "npm run lint -- --fix",
+    "prettify": "prettier . --write"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "faker": "^5.1.0",
+    "lodash": "^4.17.20",
+    "moment": "^2.29.1",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.2.5",
+    "require-directory": "^2.1.1",
+    "sequelize": "^6.3.5"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "cross-env": "^7.0.3",
+    "eslint": "7.15.0",
+    "husky": "4.3.4",
+    "lint-staged": "10.5.3",
+    "mocha": "^8.2.1",
+    "nodemon": "^2.0.6",
+    "prettier": "2.2.1",
+    "sequelize-cli": "^6.2.0",
+    "supertest": "^6.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ]
+  }
+}
