@@ -1,4 +1,4 @@
-const createItem = ({ title, userId }) => {
+const createItem = ({ title, userId } = {}) => {
 	const { Item } = global.db;
 
 	return Item.create({

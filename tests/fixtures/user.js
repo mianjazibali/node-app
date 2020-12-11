@@ -1,22 +1,28 @@
 const faker = require('faker');
-const _ = require('lodash');
 
 const UserService = require('./../../modules/userService');
 
-const getUserData = (options) => {
-	return _.assign(
-		{
-			firstName: faker.random.word(),
-			lastName: faker.random.word(),
-			email: faker.internet.email(),
-			password: faker.internet.password(),
-		},
-		options
-	);
+const getUserData = ({
+	firstName = faker.random.word(),
+	lastName = faker.random.word(),
+	email = faker.internet.email(),
+	password = faker.internet.password(),
+} = {}) => {
+	return {
+		firstName,
+		lastName,
+		email,
+		password,
+	};
 };
 
-const createUser = (options) => {
-	const userData = getUserData(options);
+const createUser = ({
+	firstName = faker.random.word(),
+	lastName = faker.random.word(),
+	email = faker.internet.email(),
+	password = faker.internet.password(),
+} = {}) => {
+	const userData = getUserData({ firstName, lastName, email, password });
 
 	return UserService.createUser(userData);
 };

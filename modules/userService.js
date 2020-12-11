@@ -1,4 +1,4 @@
-const createUser = ({ firstName, lastName, email, password }) => {
+const createUser = ({ firstName, lastName, email, password } = {}) => {
 	const { User } = global.db;
 
 	return User.create({

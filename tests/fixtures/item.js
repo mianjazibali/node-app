@@ -1,20 +1,22 @@
 const faker = require('faker');
-const _ = require('lodash');
 
 const ItemService = require('./../../modules/itemService');
 
-const getItemData = (options) => {
-	return _.assign(
-		{
-			title: faker.random.word(),
-			userId: faker.random.number(),
-		},
-		options
-	);
+const getItemData = ({
+	title = faker.random.word(),
+	userId = faker.random.number(),
+} = {}) => {
+	return {
+		title,
+		userId,
+	};
 };
 
-const createItem = (options) => {
-	const itemData = getItemData(options);
+const createItem = ({
+	title = faker.random.word(),
+	userId = faker.random.number(),
+} = {}) => {
+	const itemData = getItemData({ title, userId });
 
 	return ItemService.createItem(itemData);
 };
