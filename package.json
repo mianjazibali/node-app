@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "mocha": "cross-env NODE_ENV=test mocha tests/**/*.js --recursive --exit",
+    "mocha": "cross-env NODE_ENV=test mocha -S tests/**/*.js --recursive --exit",
     "test": "cross-env NODE_ENV=test sh -c 'npm run db:migrate && npm run mocha'",
     "test:clean": "cross-env NODE_ENV=test sh -c 'npm run db:clear && npm run mocha'",
     "db:drop": "npx sequelize-cli db:drop",

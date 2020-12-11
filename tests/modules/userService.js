@@ -1,5 +1,3 @@
-require('../../server.js');
-
 const { expect } = require('chai');
 const _ = require('lodash');
 
@@ -21,8 +19,7 @@ describe('User Service', function () {
 			expect(user.id).to.be.equal(this.user1.id);
 			helpers.user.verifyUser(user, this.user1);
 
-			expect(user.items).to.be.an('array');
-			expect(user.items.length).to.be.equal(1);
+			expect(user.items).to.be.an('array').that.has.lengthOf(1);
 
 			const userItem = _.first(user.items);
 			expect(userItem.id).to.be.equal(this.user1_item1.id);

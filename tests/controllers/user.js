@@ -14,15 +14,13 @@ describe('User API', function () {
 			const { body } = await request(app).get('/api').expect(200);
 
 			expect(body).to.have.property('users');
-			expect(body.users).to.be.an('array');
-			expect(body.users.length).to.be.equal(1);
+			expect(body.users).to.be.an('array').that.has.lengthOf(1);
 
 			const user = _.first(body.users);
 			expect(user.id).to.be.equal(this.user1.id);
 			helpers.user.verifyUser(user, this.user1);
 
-			expect(user.items).to.be.an('array');
-			expect(user.items.length).to.be.equal(1);
+			expect(user.items).to.be.an('array').that.has.lengthOf(1);
 
 			const userItem = _.first(user.items);
 			expect(userItem.id).to.be.equal(this.user1_item1.id);
