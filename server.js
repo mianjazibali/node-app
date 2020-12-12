@@ -6,13 +6,13 @@ const db = require('./app/models');
 
 global.db = db;
 
-const routes = require('./routes');
+const routes = require('./config/routes');
 
-const server = express();
+const app = express();
 
-server.use(bodyParser.json());
-server.use(logger('dev'));
+routes(app);
 
-server.use('/api', routes);
+app.use(bodyParser.json());
+app.use(logger('dev'));
 
-module.exports = server;
+module.exports = app;
