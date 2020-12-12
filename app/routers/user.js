@@ -1,7 +1,9 @@
-const userController = require('./../controllers/user');
 const { Router } = require('express');
 const router = Router();
 
-router.get('/', userController.getAllUsers);
+const verifyToken = require('../../middleware/verifyToken');
+const userController = require('./../controllers/user');
+
+router.get('/', verifyToken, userController.getAllUsers);
 
 module.exports = router;

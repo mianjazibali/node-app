@@ -1,3 +1,10 @@
+const _ = require('lodash');
+
+const UserService = require('./../../modules/userService');
+const ValidationService = require('./../../modules/validationService');
+const CustomError = require('./../../classes/error/customError');
+const { ERRORS } = require('./../../constants/user');
+
 module.exports = (sequelize, DataTypes) => {
 	const tableName = 'User';
 
@@ -44,7 +51,44 @@ module.exports = (sequelize, DataTypes) => {
 		},
 	};
 
-	const User = sequelize.define(tableName, attributes);
+	const validate = {
+		validateUser: function () {
+			const { error } = ValidationService.validateUser({
+				firstName: this.firstName,
+				lastName: this.lastName,
+				email: this.email,
+				password: this.password,
+			});
+
+			if (error) {
+				throw new CustomError({ message: error.details[0].message });
+			}
+		},
+		validateEmail: function () {
+			return (async function (user) {
+				const isUserExist = await UserService.isUserExist({
+					email: user.email,
+				});
+
+				if (isUserExist) {
+					throw new CustomError({
+						message: ERRORS.EMAIL_ALREADY_EXISTS,
+					});
+				}
+			})(this);
+		},
+	};
+
+	const User = sequelize.define(tableName, attributes, { validate });
+
+	User.beforeCreate(async (user) => {
+		const hashedPassword = await UserService.hashPassword(user.password);
+		user.password = hashedPassword;
+	});
+
+	User.prototype.toSafeJSON = function () {
+		return _.omit(this.toJSON(), ['password']);
+	};
 
 	User.associate = function (models) {
 		// associations can be defined here

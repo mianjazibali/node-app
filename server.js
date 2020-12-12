@@ -10,9 +10,9 @@ const routes = require('./config/routes');
 
 const app = express();
 
-routes(app);
-
 app.use(bodyParser.json());
 app.use(logger('dev'));
+
+routes(app);
 
 module.exports = app;
