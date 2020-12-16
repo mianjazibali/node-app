@@ -1,17 +1,18 @@
 const fixtures = require('../fixtures');
+const AuthService = require('../../modules/authService');
 
-const { User, Item } = global.db;
+const { User } = global.db;
 
 module.exports.registerHooks = function () {
 	beforeEach(async function () {
-		this.user1 = await fixtures.user.createUser();
-		this.user1_item1 = await fixtures.item.createItem({
-			userId: this.user1.id,
+		this.user1_data = fixtures.user.getUserData();
+		this.user1 = await fixtures.user.createUser(this.user1_data);
+		this.user1.tokens = AuthService.getSignedTokens({
+			userUuid: this.user1.uuid,
 		});
 	});
 
 	afterEach(async () => {
 		await User.destroy({ where: {} });
-		return Item.destroy({ where: {} });
 	});
 };

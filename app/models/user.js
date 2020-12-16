@@ -1,9 +1,14 @@
 const _ = require('lodash');
+const bcrypt = require('bcrypt');
+const { Op } = require('sequelize');
+const { v4: uuidv4 } = require('uuid');
 
-const UserService = require('./../../modules/userService');
-const ValidationService = require('./../../modules/validationService');
 const CustomError = require('./../../classes/error/customError');
-const { ERRORS } = require('./../../constants/user');
+const {
+	VALUES: { SALT_ROUNDS },
+	ERRORS,
+} = require('./../../constants/user');
+const ValidationService = require('../../modules/validationService');
 
 module.exports = (sequelize, DataTypes) => {
 	const tableName = 'User';
@@ -14,6 +19,12 @@ module.exports = (sequelize, DataTypes) => {
 			autoIncrement: true,
 			allowNull: false,
 			primaryKey: true,
+		},
+		uuid: {
+			type: DataTypes.UUID,
+			allowNull: true,
+			unique: true,
+			validate: { notEmpty: true },
 		},
 		firstName: {
 			field: 'v_first_name',
@@ -52,12 +63,14 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 	const validate = {
-		validateUser: function () {
+		validateAll: function () {
+			const { firstName, lastName, email, password } = this;
+
 			const { error } = ValidationService.validateUser({
-				firstName: this.firstName,
-				lastName: this.lastName,
-				email: this.email,
-				password: this.password,
+				firstName,
+				lastName,
+				email,
+				password,
 			});
 
 			if (error) {
@@ -66,11 +79,16 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		validateEmail: function () {
 			return (async function (user) {
-				const isUserExist = await UserService.isUserExist({
-					email: user.email,
+				const isEmailExist = await global.db.User.findOne({
+					where: {
+						email: user.email,
+						id: {
+							[Op.ne]: user.id,
+						},
+					},
 				});
 
-				if (isUserExist) {
+				if (isEmailExist) {
 					throw new CustomError({
 						message: ERRORS.EMAIL_ALREADY_EXISTS,
 					});
@@ -82,18 +100,22 @@ module.exports = (sequelize, DataTypes) => {
 	const User = sequelize.define(tableName, attributes, { validate });
 
 	User.beforeCreate(async (user) => {
-		const hashedPassword = await UserService.hashPassword(user.password);
-		user.password = hashedPassword;
+		user.uuid = uuidv4();
+		user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
 	});
 
-	User.prototype.toSafeJSON = function () {
-		return _.omit(this.toJSON(), ['password']);
+	User.prototype.isPasswordValid = function (password) {
+		return bcrypt.compare(password, this.password);
 	};
 
-	User.associate = function (models) {
-		// associations can be defined here
-		User.hasMany(models.Item, { foreignKey: 'userId', as: 'items' });
+	User.prototype.toSafeJSON = function () {
+		return _.omit(this.toJSON(), ['id', 'password']);
 	};
+
+	// User.associate = function (models) {
+	// 	// associations can be defined here
+	// 	User.hasMany(models.Item, { foreignKey: 'userId', as: 'items' });
+	// };
 
 	return User;
 };

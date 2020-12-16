@@ -3,8 +3,8 @@ const faker = require('faker');
 const UserService = require('./../../modules/userService');
 
 const getUserData = ({
-	firstName = faker.random.word(),
-	lastName = faker.random.word(),
+	firstName = faker.name.firstName(),
+	lastName = faker.name.lastName(),
 	email = faker.internet.email(),
 	password = faker.internet.password(),
 } = {}) => {
@@ -17,8 +17,8 @@ const getUserData = ({
 };
 
 const createUser = ({
-	firstName = faker.random.word(),
-	lastName = faker.random.word(),
+	firstName = faker.name.firstName(),
+	lastName = faker.name.lastName(),
 	email = faker.internet.email(),
 	password = faker.internet.password(),
 } = {}) => {

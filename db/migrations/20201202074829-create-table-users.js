@@ -11,25 +11,26 @@ module.exports = {
 				allowNull: false,
 				primaryKey: true,
 			},
+			uuid: {
+				type: Sequelize.UUID,
+				allowNull: false,
+				unique: true,
+			},
 			v_first_name: {
 				type: Sequelize.STRING,
 				allowNull: false,
-				validate: { notEmpty: true },
 			},
 			v_last_name: {
 				type: Sequelize.STRING,
 				allowNull: false,
-				validate: { notEmpty: true },
 			},
 			v_email: {
 				type: Sequelize.STRING,
 				allowNull: false,
-				validate: { notEmpty: true },
 			},
 			v_password: {
 				type: Sequelize.STRING,
 				allowNull: false,
-				validate: { notEmpty: true },
 			},
 			t_created_at: {
 				type: Sequelize.DATE,

@@ -5,7 +5,6 @@ const verifyUser = (actualUser, expectedUser) => {
 	expect(actualUser).to.have.property('firstName', expectedUser.firstName);
 	expect(actualUser).to.have.property('lastName', expectedUser.lastName);
 	expect(actualUser).to.have.property('email', expectedUser.email);
-	expect(actualUser).to.have.property('password', expectedUser.password);
 	expect(actualUser).to.have.property('createdAt');
 	expect(moment(actualUser.createdAt).unix()).to.be.closeTo(
 		moment(expectedUser.createdAt).unix(),
