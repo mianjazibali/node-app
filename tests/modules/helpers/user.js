@@ -1,7 +1,7 @@
 const moment = require('moment');
 const { expect } = require('chai');
 
-const verifyUser = (actualUser, expectedUser) => {
+const verifyUser = ({ actualUser, expectedUser } = {}) => {
 	expect(actualUser).to.have.property('firstName', expectedUser.firstName);
 	expect(actualUser).to.have.property('lastName', expectedUser.lastName);
 	expect(actualUser).to.have.property('email', expectedUser.email);

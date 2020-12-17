@@ -29,26 +29,18 @@ module.exports = (sequelize, DataTypes) => {
 		firstName: {
 			field: 'v_first_name',
 			type: DataTypes.STRING,
-			allowNull: false,
-			validate: { notEmpty: true },
 		},
 		lastName: {
 			field: 'v_last_name',
 			type: DataTypes.STRING,
-			allowNull: false,
-			validate: { notEmpty: true },
 		},
 		email: {
 			field: 'v_email',
 			type: DataTypes.STRING,
-			allowNull: false,
-			validate: { notEmpty: true },
 		},
 		password: {
 			field: 'v_password',
 			type: DataTypes.STRING,
-			allowNull: false,
-			validate: { notEmpty: true },
 		},
 		createdAt: {
 			field: 't_created_at',
@@ -90,7 +82,7 @@ module.exports = (sequelize, DataTypes) => {
 
 				if (isEmailExist) {
 					throw new CustomError({
-						message: ERRORS.EMAIL_ALREADY_EXISTS,
+						message: ERRORS.EMAIL.EXISTS,
 					});
 				}
 			})(this);

@@ -1,12 +1,13 @@
 const faker = require('faker');
 const moment = require('moment');
+const { expect } = require('chai');
 
 const AuthService = require('../../modules/authService');
 const AuthTestHelper = require('./helpers/auth');
 const AuthFixture = require('./../fixtures/auth');
-const { VALUES } = require('../../constants/auth');
+const { VALUES, ERRORS: AUTH_ERRORS } = require('../../constants/auth');
 const setup = require('./setup');
-const { expect } = require('chai');
+const { ERRORS } = require('../../constants/user');
 
 describe('Auth Service Tests', function () {
 	setup.registerHooks();
@@ -34,8 +35,11 @@ describe('Auth Service Tests', function () {
 				});
 
 				expect(1).to.be.equal(2);
-			} catch (error) {
-				expect(error).to.have.property('message', 'jwt malformed');
+			} catch (err) {
+				expect(err).to.have.property(
+					'message',
+					AUTH_ERRORS.TOKEN.INVALID
+				);
 			}
 		});
 	});
@@ -67,8 +71,11 @@ describe('Auth Service Tests', function () {
 				});
 
 				expect(1).to.be.equal(2);
-			} catch (error) {
-				expect(error).to.have.property('message', 'jwt malformed');
+			} catch (err) {
+				expect(err).to.have.property(
+					'message',
+					AUTH_ERRORS.TOKEN.INVALID
+				);
 			}
 		});
 	});
@@ -136,17 +143,46 @@ describe('Auth Service Tests', function () {
 			});
 		});
 
+		it('should throw error if email is not provided', async function () {
+			try {
+				await AuthService.getUserSignedTokens({
+					password: faker.internet.password(),
+				});
+			} catch (err) {
+				expect(err).to.have.property('message', ERRORS.EMAIL.REQUIRED);
+			}
+		});
+
+		it('should throw error if email is not in a string format', async function () {
+			try {
+				await AuthService.getUserSignedTokens({
+					email: faker.random.number(),
+					password: faker.internet.password(),
+				});
+			} catch (err) {
+				expect(err).to.have.property('message', ERRORS.EMAIL.TYPE_TEXT);
+			}
+		});
+
+		it('should throw error if email is an empty string', async function () {
+			try {
+				await AuthService.getUserSignedTokens({
+					email: '',
+					password: faker.internet.password(),
+				});
+			} catch (err) {
+				expect(err).to.have.property('message', ERRORS.EMAIL.EMPTY);
+			}
+		});
+
 		it('should throw error if email is not valid', async function () {
 			try {
 				await AuthService.getUserSignedTokens({
 					email: faker.random.word(),
 					password: faker.internet.password(),
 				});
-			} catch (error) {
-				expect(error).to.have.property(
-					'message',
-					'"email" must be a valid email'
-				);
+			} catch (err) {
+				expect(err).to.have.property('message', ERRORS.EMAIL.INVALID);
 			}
 		});
 
@@ -156,11 +192,46 @@ describe('Auth Service Tests', function () {
 					email: faker.internet.email(),
 					password: this.user1_data.password,
 				});
-			} catch (error) {
-				expect(error).to.have.property(
+			} catch (err) {
+				expect(err).to.have.property('message', ERRORS.EMAIL.NOT_EXIST);
+			}
+		});
+
+		it('should throw error if password is not provided', async function () {
+			try {
+				await AuthService.getUserSignedTokens({
+					email: this.user1_data.email,
+				});
+			} catch (err) {
+				expect(err).to.have.property(
 					'message',
-					'"email" does not exist'
+					ERRORS.PASSWORD.REQUIRED
 				);
+			}
+		});
+
+		it('should throw error if password is not in a string format', async function () {
+			try {
+				await AuthService.getUserSignedTokens({
+					email: this.user1_data.email,
+					password: faker.random.number(),
+				});
+			} catch (err) {
+				expect(err).to.have.property(
+					'message',
+					ERRORS.PASSWORD.TYPE_TEXT
+				);
+			}
+		});
+
+		it('should throw error if password is an empty string', async function () {
+			try {
+				await AuthService.getUserSignedTokens({
+					email: this.user1_data.email,
+					password: '',
+				});
+			} catch (err) {
+				expect(err).to.have.property('message', ERRORS.PASSWORD.EMPTY);
 			}
 		});
 
@@ -170,10 +241,10 @@ describe('Auth Service Tests', function () {
 					email: this.user1_data.email,
 					password: faker.internet.password(7),
 				});
-			} catch (error) {
-				expect(error).to.have.property(
+			} catch (err) {
+				expect(err).to.have.property(
 					'message',
-					'"password" length must be at least 8 characters long'
+					ERRORS.PASSWORD.MIN_LENGTH
 				);
 			}
 		});
@@ -184,10 +255,10 @@ describe('Auth Service Tests', function () {
 					email: this.user1_data.email,
 					password: faker.internet.password(21),
 				});
-			} catch (error) {
-				expect(error).to.have.property(
+			} catch (err) {
+				expect(err).to.have.property(
 					'message',
-					'"password" length must be less than or equal to 20 characters long'
+					ERRORS.PASSWORD.MAX_LENGTH
 				);
 			}
 		});
@@ -198,10 +269,10 @@ describe('Auth Service Tests', function () {
 					email: this.user1_data.email,
 					password: faker.internet.password(8),
 				});
-			} catch (error) {
-				expect(error).to.have.property(
+			} catch (err) {
+				expect(err).to.have.property(
 					'message',
-					'"password" does not match'
+					ERRORS.PASSWORD.INVALID
 				);
 			}
 		});

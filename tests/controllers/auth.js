@@ -9,7 +9,8 @@ const AuthService = require('../../modules/authService');
 const AuthFixture = require('../fixtures/auth');
 const AuthTestHelper = require('../modules/helpers/auth');
 const UserTestHelper = require('../modules/helpers/user');
-const { VALUES } = require('../../constants/auth');
+const ErrorTestHelper = require('../modules/helpers/error');
+const { VALUES, ERRORS: AUTH_ERRORS } = require('../../constants/auth');
 const { ERRORS } = require('../../constants/user');
 
 describe('User Controller Tests', function () {
@@ -56,32 +57,41 @@ describe('User Controller Tests', function () {
 		});
 
 		it('should not return user access and refresh token if email does not exist', async function () {
-			const response = await request(app)
+			const statusCode = 400;
+
+			const { body: actualError } = await request(app)
 				.post('/api/auth/login')
 				.set('Accept', 'application/json')
 				.send({
 					email: faker.internet.email(),
 					password: this.user1_data.password,
 				})
-				.expect(400);
+				.expect(statusCode);
 
-			expect(response).to.have.property(
-				'text',
-				ERRORS.EMAIL_DOES_NOT_EXIST
-			);
+			const expectedError = ErrorTestHelper.createResponseData({
+				status: statusCode,
+				message: ERRORS.EMAIL.NOT_EXIST,
+			});
+			ErrorTestHelper.verifyResponseError({ actualError, expectedError });
 		});
 
 		it('should not return user access and refresh token if password does not match', async function () {
-			const response = await request(app)
+			const statusCode = 400;
+
+			const { body: actualError } = await request(app)
 				.post('/api/auth/login')
 				.set('Accept', 'application/json')
 				.send({
 					email: this.user1_data.email,
 					password: faker.internet.password(),
 				})
-				.expect(400);
+				.expect(statusCode);
 
-			expect(response).to.have.property('text', ERRORS.INVALID_PASSWORD);
+			const expectedError = ErrorTestHelper.createResponseData({
+				status: statusCode,
+				message: ERRORS.PASSWORD.INVALID,
+			});
+			ErrorTestHelper.verifyResponseError({ actualError, expectedError });
 		});
 	});
 
@@ -102,11 +112,16 @@ describe('User Controller Tests', function () {
 
 			expect(response).to.have.property('user');
 			expect(response.user).to.not.have.property('password');
-			UserTestHelper.verifyUser(response.user, userData);
+			UserTestHelper.verifyUser({
+				actualUser: response.user,
+				expectedUser: userData,
+			});
 		});
 
 		it('should not register user if email already exists', async function () {
-			const response = await request(app)
+			const statusCode = 400;
+
+			const { body: actualError } = await request(app)
 				.post('/api/auth/register')
 				.set('Accept', 'application/json')
 				.send({
@@ -115,12 +130,13 @@ describe('User Controller Tests', function () {
 					email: this.user1_data.email,
 					password: faker.internet.password(),
 				})
-				.expect(500);
+				.expect(statusCode);
 
-			expect(response).to.have.property(
-				'text',
-				`Validation error: ${ERRORS.EMAIL_ALREADY_EXISTS}`
-			);
+			const expectedError = ErrorTestHelper.createResponseData({
+				status: statusCode,
+				message: ERRORS.EMAIL.EXISTS,
+			});
+			ErrorTestHelper.verifyResponseError({ actualError, expectedError });
 		});
 	});
 
@@ -165,13 +181,22 @@ describe('User Controller Tests', function () {
 		});
 
 		it('should not return refreshed authentication tokens', async function () {
-			const response = await request(app)
+			const statusCode = 400;
+
+			const { body: actualResponse } = await request(app)
 				.post('/api/auth/refresh-token')
 				.set('Accept', 'application/json')
 				.set('Authorization', `Bearer ${this.user1.tokens.accessToken}`)
-				.expect(500);
+				.expect(statusCode);
 
-			expect(response).to.have.property('text', 'invalid signature');
+			const expectedResponse = ErrorTestHelper.createResponseData({
+				status: statusCode,
+				message: AUTH_ERRORS.TOKEN.INVALID,
+			});
+			ErrorTestHelper.verifyResponseError({
+				actualError: actualResponse,
+				expectedError: expectedResponse,
+			});
 		});
 	});
 });

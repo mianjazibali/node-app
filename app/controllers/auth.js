@@ -1,5 +1,6 @@
 const UserService = require('../../modules/userService');
 const AuthService = require('../../modules/authService');
+const ResponseService = require('../../modules/responseService');
 
 const register = async (req, res) => {
 	try {
@@ -11,9 +12,8 @@ const register = async (req, res) => {
 		});
 
 		return res.json({ user: user.toSafeJSON() });
-	} catch (error) {
-		const statusCode = error.statusCode || 500;
-		return res.status(statusCode).send(error.message);
+	} catch (err) {
+		ResponseService.sendError({ res, err });
 	}
 };
 
@@ -25,9 +25,8 @@ const login = async (req, res) => {
 		});
 
 		return res.json(userAuthTokens);
-	} catch (error) {
-		const statusCode = error.statusCode || 500;
-		return res.status(statusCode).send(error.message);
+	} catch (err) {
+		ResponseService.sendError({ res, err });
 	}
 };
 
@@ -38,9 +37,8 @@ const getSignedTokens = async (req, res) => {
 		});
 
 		return res.json(userAuthTokens);
-	} catch (error) {
-		const statusCode = error.statusCode || 500;
-		res.status(statusCode).send(error.message);
+	} catch (err) {
+		ResponseService.sendError({ res, err });
 	}
 };
 

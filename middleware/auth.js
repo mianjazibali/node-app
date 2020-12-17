@@ -1,13 +1,14 @@
 const CustomError = require('../classes/error/customError');
 
 const AuthService = require('../modules/authService');
+const ResponseService = require('../modules/responseService');
 const { ERRORS } = require('../constants/auth');
 
 const verifyAccessToken = (req, res, next) => {
 	try {
 		const authHeader = req.header('Authorization');
 		if (!authHeader || !authHeader.startsWith('Bearer ')) {
-			throw new CustomError({ message: ERRORS.INVALID_TOKEN });
+			throw new CustomError({ message: ERRORS.TOKEN.INVALID });
 		}
 
 		const bearerToken = authHeader.split(' ');
@@ -17,8 +18,8 @@ const verifyAccessToken = (req, res, next) => {
 
 		req.payload = payload;
 		next();
-	} catch (error) {
-		return res.status(500).send(error.message);
+	} catch (err) {
+		ResponseService.sendError({ res, err });
 	}
 };
 
@@ -26,7 +27,7 @@ const verifyRefreshToken = (req, res, next) => {
 	try {
 		const authHeader = req.header('Authorization');
 		if (!authHeader || !authHeader.startsWith('Bearer ')) {
-			throw new CustomError({ message: ERRORS.INVALID_TOKEN });
+			throw new CustomError({ message: ERRORS.TOKEN.INVALID });
 		}
 
 		const bearerToken = authHeader.split(' ');
@@ -36,8 +37,8 @@ const verifyRefreshToken = (req, res, next) => {
 
 		req.payload = payload;
 		next();
-	} catch (error) {
-		return res.status(500).send(error.message);
+	} catch (err) {
+		ResponseService.sendError({ res, err });
 	}
 };
 

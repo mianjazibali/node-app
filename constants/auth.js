@@ -4,7 +4,11 @@ const VALUES = {
 };
 
 const ERRORS = {
-	INVALID_TOKEN: 'Invalid token',
+	TOKEN: {
+		INVALID: 'Token is not valid',
+		EXPIRED: 'Token is expired',
+		INACTIVE: 'Token is not active yet',
+	},
 };
 
 module.exports = {
